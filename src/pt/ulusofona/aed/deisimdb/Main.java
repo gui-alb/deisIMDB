@@ -387,6 +387,16 @@ public class Main {
 
                 break;
             }
+            case "TOP_MONTH_MOVIE_COUNT":{
+                result.result = ExecuteFunctions.topMovieCount(Integer.parseInt(partesComando[1]));
+                break;
+            }
+            case "TOP_VOTED_ACTORS":{
+                int num = Integer.parseInt(partesComando[1]);
+                int year = Integer.parseInt(partesComando[2]);
+                result.result = ExecuteFunctions.topVotedActors(num, year);
+                break;
+            }
             case null, default:{
                 result.success = false;
                 result.error = "deu erro chefe";

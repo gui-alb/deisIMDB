@@ -16,4 +16,8 @@ public class MovieVotes {
         return movieId;
     }
 
+    public double getMovieRating(){
+        return movieRating;
+    }
+
 }

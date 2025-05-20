@@ -15,7 +15,7 @@ public class ExecuteFunctions {
                 "GET_MOVIES_WITH_ACTOR_CONTAINING <name>\n" +
                 "GET_TOP_4_YEARS_WITH_MOVIES_CONTAINING <search-string>\n" +
                 "GET_ACTORS_BY_DIRECTOR <num> <full-name>\n" +
-                "TOP_MONTH_MOVIE_COUNT <year>\n" + //f
+                "TOP_MONTH_MOVIE_COUNT <year>\n" +
                 "TOP_VOTED_ACTORS <num> <year>\n" + //f
                 "TOP_MOVIES_WITH_MORE_GENDER <num> <year> <gender>\n" + //f
                 "TOP_MOVIES_WITH_GENDER_BIAS <num> <year>\n" + //f
@@ -132,20 +132,20 @@ public class ExecuteFunctions {
     }
 
     public static String getTop4YearsWithMovieContaining(String parteNome){
-        List<Pair> list = new ArrayList<>();
+        List<Pair<Integer, Integer>> list = new ArrayList<>();
 
         for (Movie movie : Main.movieList) {
             if (movie.getMovieName().contains(parteNome)){
                 int ano = movie.getMovieReleaseDate().getYear();
                 boolean exist = false;
-                for (Pair pair : list) {
-                    if (pair.getValor1int() == ano){
+                for (Pair<Integer, Integer> pair : list) {
+                    if (pair.getValor1().equals(ano)){
                         pair.valor2++;
                         exist = true;
                     }
                 }
                 if (!exist){
-                    list.add(new Pair("" + ano, 1));
+                    list.add(new Pair<>(ano, 1));
                 }
             }
         }
@@ -154,30 +154,30 @@ public class ExecuteFunctions {
             return "No results";
         }
 
-        list.sort(Comparator.comparing(Pair::getValor2).reversed().thenComparing(Pair::getValor1int));
+        list.sort(Comparator.comparing(Pair<Integer, Integer>::getValor2).reversed().thenComparing(Pair::getValor1));
         StringBuilder res = new StringBuilder();
-        for (Pair pair : list) {
+        for (Pair<Integer, Integer> pair : list) {
             res.append(pair.valor1).append(":").append(pair.valor2).append("\n");
         }
         return res.toString();
     }
 
     public static String getActorsByDirector(int nVezes, String nome){
-        List<Pair> list = new ArrayList<>();
+        List<Pair<String, Integer>> list = new ArrayList<>();
 
         for (Director director : Main.directorList) {
             if (director.getDirectorName().equals(nome)){
                 for (Actor actor : Main.actorList) {
                     if (actor.getMovieId() == director.getMovieId()){
                         boolean exist = false;
-                        for (Pair pair : list) {
+                        for (Pair<String, Integer> pair : list) {
                             if (pair.valor1.equals(actor.getActorName())){
                                 pair.valor2++;
                                 exist = true;
                             }
                         }
                         if (!exist){
-                            list.add(new Pair(actor.getActorName(), 1));
+                            list.add(new Pair<>(actor.getActorName(), 1));
                         }
                     }
                 }
@@ -191,8 +191,8 @@ public class ExecuteFunctions {
         StringBuilder res = new StringBuilder();
         boolean min = false;
 
-        for (Pair pair : list) {
-            if (pair.valor2 >= nVezes){
+        for (Pair<String, Integer> pair : list) {
+            if (pair.getValor2() >= nVezes){
                 res.append(pair.valor1).append(":").append(pair.valor2).append("\n");
                 min = true;
             }
@@ -202,4 +202,69 @@ public class ExecuteFunctions {
 
         return res.toString();
     }
+
+    public static String topMovieCount(int ano){
+        List<Pair<Integer, Integer>> list = new ArrayList<>();
+
+        for (Movie movie : Main.movieList) {
+            if (movie.getMovieReleaseDate().getYear() == ano){
+                int mes = movie.getMovieReleaseDate().getMonthValue();
+                boolean exist = false;
+                for (Pair<Integer, Integer> pair : list) {
+                    if (pair.valor1 == mes){
+                        pair.valor2++;
+                        exist = true;
+                    }
+                }
+                if (!exist){
+                    list.add(new Pair<>(mes, 1));
+                }
+            }
+        }
+
+        list.sort(Comparator.comparing(Pair<Integer, Integer>::getValor2).reversed());
+
+        return list.getFirst().valor1 + ":" + list.getFirst().valor2;
+    }
+
+    public static String topVotedActors(int num, int year){
+        List<Pair<String, Double>> lista = new ArrayList<>();
+        int i = 0;
+        for (Movie movie : Main.movieList) {
+            if (movie.getMovieReleaseDate().getYear() == year) {
+                double movieVote = 0.0;
+                for (MovieVotes movieVotes : Main.votesList) {
+                    if (movieVotes.getMovieId() == movie.getMovieId()){
+                        movieVote = movieVotes.getMovieRating();
+                        break;
+                    }
+                }
+                for (Actor actor : Main.actorList) {
+                    if (actor.getMovieId() == movie.getMovieId()){
+                        lista.add(i, new Pair<>(actor.getActorName(), movieVote));
+                        i++;
+                    }
+                }
+            }
+        }
+        if (lista.isEmpty()){
+            return "No results";
+        }
+
+        lista.sort(Comparator.comparing(Pair<String, Double>::getValor2).reversed());
+
+        StringBuilder res = new StringBuilder();
+        i = 0;
+
+        for (Pair<String, Double> pair : lista) {
+            if (i >= num){
+                break;
+            }
+            res.append(pair.valor1).append(":").append(pair.valor2).append("\n");
+            i++;
+        }
+        return res.toString();
+    }
+
+
 }

@@ -1,26 +1,26 @@
 package pt.ulusofona.aed.deisimdb;
 
-public class Pair {
-    String valor1;
-    int valor2;
+public class Pair<K, V> {
+    K valor1;
+    V valor2;
 
     public Pair() {
     }
 
-    public Pair(String valor1, int valor2) {
+    public Pair(K valor1, V valor2) {
         this.valor1 = valor1;
         this.valor2 = valor2;
     }
 
-    public int getValor1int() {
-        return Integer.parseInt(valor1);
-    }
-
-    public String getValor1() {
+    public K getValor1() {
         return valor1;
     }
 
-    public int getValor2() {
+    public V getValor2() {
         return valor2;
+    }
+
+    public V setValor2(V valor2){
+        return this.valor2 = valor2;
     }
 }
