@@ -381,6 +381,12 @@ public class Main {
                 result.result = ExecuteFunctions.getTop4YearsWithMovieContaining(partesComando[1]);
                 break;
             }
+            case "GET_ACTORS_BY_DIRECTOR":{
+                String fullName = partesComando[2] + " " + partesComando[3];
+                result.result = ExecuteFunctions.getActorsByDirector(Integer.parseInt(partesComando[1]), fullName);
+
+                break;
+            }
             case null, default:{
                 result.success = false;
                 result.error = "deu erro chefe";

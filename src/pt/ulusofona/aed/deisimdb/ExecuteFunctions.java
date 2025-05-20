@@ -13,8 +13,8 @@ public class ExecuteFunctions {
                 "COUNT_MOVIES_BETWEEN_YEARS_WITH_N_ACTORS <year-start> <year-end> <min> <max>\n" +
                 "GET_MOVIES_ACTOR_YEAR <year> <full-name>\n" +
                 "GET_MOVIES_WITH_ACTOR_CONTAINING <name>\n" +
-                "GET_TOP_4_YEARS_WITH_MOVIES_CONTAINING <search-string>" +
-                "GET_ACTORS_BY_DIRECTOR <num> <full-name>\n" + //f
+                "GET_TOP_4_YEARS_WITH_MOVIES_CONTAINING <search-string>\n" +
+                "GET_ACTORS_BY_DIRECTOR <num> <full-name>\n" +
                 "TOP_MONTH_MOVIE_COUNT <year>\n" + //f
                 "TOP_VOTED_ACTORS <num> <year>\n" + //f
                 "TOP_MOVIES_WITH_MORE_GENDER <num> <year> <gender>\n" + //f
@@ -139,13 +139,13 @@ public class ExecuteFunctions {
                 int ano = movie.getMovieReleaseDate().getYear();
                 boolean exist = false;
                 for (Pair pair : list) {
-                    if (pair.getValor1() == ano){
+                    if (pair.getValor1int() == ano){
                         pair.valor2++;
                         exist = true;
                     }
                 }
                 if (!exist){
-                    list.add(new Pair(ano, 1));
+                    list.add(new Pair("" + ano, 1));
                 }
             }
         }
@@ -154,7 +154,7 @@ public class ExecuteFunctions {
             return "No results";
         }
 
-        list.sort(Comparator.comparing(Pair::getValor2).reversed().thenComparing(Pair::getValor1));
+        list.sort(Comparator.comparing(Pair::getValor2).reversed().thenComparing(Pair::getValor1int));
         StringBuilder res = new StringBuilder();
         for (Pair pair : list) {
             res.append(pair.valor1).append(":").append(pair.valor2).append("\n");
@@ -163,8 +163,43 @@ public class ExecuteFunctions {
     }
 
     public static String getActorsByDirector(int nVezes, String nome){
+        List<Pair> list = new ArrayList<>();
 
+        for (Director director : Main.directorList) {
+            if (director.getDirectorName().equals(nome)){
+                for (Actor actor : Main.actorList) {
+                    if (actor.getMovieId() == director.getMovieId()){
+                        boolean exist = false;
+                        for (Pair pair : list) {
+                            if (pair.valor1.equals(actor.getActorName())){
+                                pair.valor2++;
+                                exist = true;
+                            }
+                        }
+                        if (!exist){
+                            list.add(new Pair(actor.getActorName(), 1));
+                        }
+                    }
+                }
+            }
+        }
 
-        return "";
+        if (list.isEmpty()){
+            return "No results";
+        }
+
+        StringBuilder res = new StringBuilder();
+        boolean min = false;
+
+        for (Pair pair : list) {
+            if (pair.valor2 >= nVezes){
+                res.append(pair.valor1).append(":").append(pair.valor2).append("\n");
+                min = true;
+            }
+        }
+
+        if (!min){return "No results";}
+
+        return res.toString();
     }
 }
