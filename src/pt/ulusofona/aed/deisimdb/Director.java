@@ -19,12 +19,12 @@ public class Director {
     }
 
     public int getDirectorId() {
-        return this.directorId = directorId;
+        return this.directorId;
     }
     public String getDirectorName() {
-        return this.directorName = directorName;
+        return this.directorName;
     }
     public int getMovieId() {
-        return this.movieId = movieId;
+        return this.movieId;
     }
 }

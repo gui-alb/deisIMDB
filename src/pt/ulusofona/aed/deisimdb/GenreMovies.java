@@ -14,6 +14,6 @@ public class GenreMovies {
     }
 
     public int getMovieId() {
-        return this.genreId;
+        return this.movieId;
     }
 }

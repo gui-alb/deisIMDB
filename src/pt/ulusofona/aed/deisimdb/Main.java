@@ -320,30 +320,113 @@ public class Main {
         return objects;
     }
 
+    public static Result execute(String command){
+        String[] partesComando = command.trim().split(" ");
+
+        Result result = new Result();
+
+        if (partesComando.length == 0){
+            result.success = false;
+            result.error = "Nenhum comando inserido"; //ver dps qual o output certo
+            return result;
+        }
+
+        String comando = partesComando[0];
+        result.success = true;
+
+        switch (comando){
+            case "HELP": {
+                result.result = ExecuteFunctions.help();
+                break;
+            }
+            case "COUNT_MOVIES_MONTH_YEAR": {
+                int mes = Integer.parseInt(partesComando[1]);
+                int ano = Integer.parseInt(partesComando[2]);
+                result.result = ExecuteFunctions.countMoviesMonthYear(mes, ano);
+                break;
+            }
+            case "COUNT_MOVIES_DIRECTOR": {
+                String nomeCompleto = partesComando[1] + " " + partesComando[2];
+                result.result = ExecuteFunctions.countMoviesDirector(nomeCompleto);
+                break;
+            }
+            case "COUNT_ACTORS_IN_2_YEARS": {
+                int ano1 = Integer.parseInt(partesComando[1]);
+                int ano2 = Integer.parseInt(partesComando[2]);
+                result.result = ExecuteFunctions.countActorsIn2Years(ano1, ano2);
+                break;
+            }
+            case "COUNT_MOVIES_BETWEEN_YEARS_WITH_N_ACTORS": {
+                int ano1 = Integer.parseInt(partesComando[1]);
+                int ano2 = Integer.parseInt(partesComando[2]);
+
+                int min = Integer.parseInt(partesComando[3]);
+                int max = Integer.parseInt(partesComando[4]);
+
+                result.result = ExecuteFunctions.countMoviesBetweenYearsWithNActors(ano1, ano2, min, max);
+                break;
+            }
+            case "GET_MOVIES_ACTOR_YEAR":{
+                int ano = Integer.parseInt(partesComando[1]);
+                String nomeCompleto = partesComando[2] + " " + partesComando[3];
+                result.result = ExecuteFunctions.getMoviesActorYear(ano, nomeCompleto);
+
+                break;
+            }
+            case "GET_MOVIES_WITH_ACTOR_CONTAINING":{
+                result.result = ExecuteFunctions.getMoviesWithActorContaining(partesComando[1]);
+                break;
+            }
+            case "GET_TOP_4_YEARS_WITH_MOVIES_CONTAINING":{
+                result.result = ExecuteFunctions.getTop4YearsWithMovieContaining(partesComando[1]);
+                break;
+            }
+            case null, default:{
+                result.success = false;
+                result.error = "deu erro chefe";
+                break;
+            }
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         System.out.println("Bem-vindo ao deisIMDB");
 
-        File testFolder = new File("files");
+        File testFolder = new File("test_files");
         System.out.println("Parsing files in folder: " + testFolder.getAbsolutePath());
 
         long startTime = System.currentTimeMillis();
         boolean parseOk = parseFiles(testFolder);
         if (!parseOk) {
             System.out.println("Erro ao processar os ficheiros.");
-            System.out.println("--- Logs ---");
-            ArrayList<String> logs = getObjects(TipoEntidade.INPUT_INVALIDO);
-            for(String log : logs) {
-                System.out.println(log);
-            }
             return;
         }
         long endTime = System.currentTimeMillis();
         System.out.println("Ficheiros processados com sucesso em: " + (endTime - startTime) + " ms");
 
-        System.out.println("--- Logs ---");
-        ArrayList<String> logs = getObjects(TipoEntidade.INPUT_INVALIDO);
-        for(String log : logs) {
-            System.out.println(log);
-        }
+        Result result = execute("HELP");
+        System.out.println(result.result);
+
+        Scanner in = new Scanner(System.in);
+        String line;
+
+        do {
+            System.out.print("> ");
+            line = in.nextLine();
+
+            if (line != null && !line.equals("QUIT")){
+                startTime = System.currentTimeMillis();
+                result = execute(line);
+                endTime = System.currentTimeMillis();
+
+                if (!result.success){
+                    System.out.println("Erro: " + result.error);
+                } else {
+                    System.out.println(result.result);
+                    System.out.println("Demorou " + (endTime - startTime) + "ms");
+                }
+            }
+        } while (line != null && !line.equals("QUIT"));
     }
 }

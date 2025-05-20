@@ -20,6 +20,10 @@ public class Actor {
         return this.movieId;
     }
 
+    public String getActorGender() {return this.actorGender;}
+
+    public String getActorName() {return this.actorName;}
+
     public String getActorString() {
         String gender = "";
 

@@ -1,7 +1,7 @@
 package pt.ulusofona.aed.deisimdb;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 public class Movie {
@@ -19,26 +19,78 @@ public class Movie {
         this.movieReleaseDate = movieReleaseDate;
     }
 
-    int getAmountOfActors() {
-        int count = 0;
+    void getAmountOfActors(int[] actorByGender) {
         for (Actor actor : Main.actorList) {
             if (actor.getMovieId() == this.movieId) {
+                String gender = actor.getActorGender();
+                if (Objects.equals(gender, "M")){
+                    actorByGender[0]++;
+                } else {
+                    actorByGender[1]++;
+                }
+            }
+        }
+    }
+
+    int getAmountOfGenres() {
+        int count = 0;
+        for (GenreMovies genre : Main.genreMoviesList) {
+            if (genre.getMovieId() == this.movieId) {
                 count++;
             }
         }
         return count;
     }
 
+    String getGenres(){
+        List<String> genres = new ArrayList<>();
+        for (GenreMovies genreMovie : Main.genreMoviesList) {
+            if (genreMovie.getMovieId() == this.movieId){
+                for (Genre genre : Main.genreList) {
+                    if (genre.getGenreId() == genreMovie.getGenreId()){
+                        genres.add(genre.getGenreName());
+                    }
+                }
+            }
+        }
+        Collections.sort(genres);
+        return String.join(",", genres);
+    }
+
+    int getAmountOfDirectors() {
+        int count = 0;
+        for (Director director : Main.directorList) {
+            if (director.getMovieId() == this.movieId) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    String getDirectors(){
+        List<String> directors = new ArrayList<>();
+        for (Director director : Main.directorList) {
+            if (director.getMovieId() == this.movieId){
+                directors.add(director.getDirectorName());
+            }
+        }
+        Collections.sort(directors);
+        return String.join(",", directors);
+    }
+
     public String getMovieString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+        int[] actorsByGender = {0, 0};
+        getAmountOfActors(actorsByGender);
+        String directors = getDirectors();
 
         if (movieId < 1000) {
-            return movieId + " | " + movieName + " | " + movieReleaseDate.format(outputFormatter) + " | " + getAmountOfActors();
+            return movieId + " | " + movieName + " | " + movieReleaseDate.format(outputFormatter) + " | " + getGenres() + " | "+ directors + " | " + actorsByGender[0] + " | " + actorsByGender[1];
         }
 
-        return movieId + " | " + movieName + " | " + movieReleaseDate.format(outputFormatter);
+        return movieId + " | " + movieName + " | " + movieReleaseDate.format(outputFormatter) + " | " + getAmountOfGenres() + " | " + getAmountOfDirectors() + " | " + actorsByGender[0] + " | " + actorsByGender[1];
     }
 
     public int getMovieId() {
