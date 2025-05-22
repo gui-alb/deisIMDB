@@ -174,20 +174,19 @@ public class Main {
                                 int year = Integer.parseInt(parts[2]);
                                 LocalDate movieReleaseDate = LocalDate.of(year, month, day);
 
-//                                boolean idExists = false;
-//                                for (Movie m : movieList) {
-//                                    if (m.getMovieId() == movieId) {
-//                                        idExists = true;
-//                                        break;
-//                                    }
-//                                }
-//
-//                                if (idExists) {
-//                                    skipAdding = true;
-//                                } else {
-//
-//                                }
-                                movieList.add(new Movie(movieId, movieName, movieDuration, movieBudget, movieReleaseDate));
+                                boolean idExists = false;
+                                for (Movie m : movieList) {
+                                    if (m.getMovieId() == movieId) {
+                                        idExists = true;
+                                        break;
+                                    }
+                                }
+
+                                if (idExists) {
+                                    skipAdding = true;
+                                } else {
+                                    movieList.add(new Movie(movieId, movieName, movieDuration, movieBudget, movieReleaseDate));
+                                }
                                 break;
                             }
 
@@ -333,6 +332,11 @@ public class Main {
 
         String comando = partesComando[0];
         result.success = true;
+        if (comando.isEmpty()){
+            result.success = false;
+            result.result = "deu errooo";
+            return result;
+        }
 
         switch (comando){
             case "HELP": {
@@ -397,7 +401,35 @@ public class Main {
                 result.result = ExecuteFunctions.topVotedActors(num, year);
                 break;
             }
-            case null, default:{
+            case "TOP_MOVIES_WITH_MORE_GENDER":{
+                int num = Integer.parseInt(partesComando[1]);
+                int ano = Integer.parseInt(partesComando[2]);
+                result.result = ExecuteFunctions.topMoviesWithMoreGender(num, ano, partesComando[3]);
+                break;
+            }
+            case "TOP_MOVIES_WITH_GENDER_BIAS":{
+                int num = Integer.parseInt(partesComando[1]);
+                int ano = Integer.parseInt(partesComando[2]);
+                result.result = ExecuteFunctions.topMoviesWithGenderBias(num, ano);
+                break;
+            }
+            case "TOP_6_DIRECTORS_WITHIN_FAMILY":{
+                result.result = "falta2";
+                break;
+            }//falta
+            case "INSERT_ACTOR":{
+                result.result = "falta3";
+                break;
+            }//falta
+            case "INSERT_DIRECTOR":{
+                result.result = "falta5";
+                break;
+            }//falta
+            case "DISTANCE_BETWEEN_ACTORS":{
+                result.result = "falta4";
+                break;
+            }//falta
+            default: {
                 result.success = false;
                 result.error = "deu erro chefe";
                 break;

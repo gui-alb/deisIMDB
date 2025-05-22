@@ -16,11 +16,12 @@ public class ExecuteFunctions {
                 "GET_TOP_4_YEARS_WITH_MOVIES_CONTAINING <search-string>\n" +
                 "GET_ACTORS_BY_DIRECTOR <num> <full-name>\n" +
                 "TOP_MONTH_MOVIE_COUNT <year>\n" +
-                "TOP_VOTED_ACTORS <num> <year>\n" + //f
-                "TOP_MOVIES_WITH_MORE_GENDER <num> <year> <gender>\n" + //f
-                "TOP_MOVIES_WITH_GENDER_BIAS <num> <year>\n" + //f
+                "TOP_VOTED_ACTORS <num> <year>\n" +
+                "TOP_MOVIES_WITH_MORE_GENDER <num> <year> <gender>\n" +
+                "TOP_MOVIES_WITH_GENDER_BIAS <num> <year>\n" +
                 "TOP_6_DIRECTORS_WITHIN_FAMILY <year-start> <year-end>\n" + //f
                 "INSERT_ACTOR <id>;<name>;<movie-id>\n" + //f
+                "INSERT_DIRECTOR <id>;<name>;<movie-id>\n" + //f
                 "DISTANCE_BETWEEN_ACTORS <actor-1>,<actor-2>\n" + //f
                 "HELP\n" +
                 "QUIT\n" +
@@ -84,7 +85,9 @@ public class ExecuteFunctions {
                         count++;
                     }
                 }
-                if (count > min && count < max) res ++;
+                if (count > min && count < max){
+                    res ++;
+                }
             }
         }
 
@@ -224,7 +227,7 @@ public class ExecuteFunctions {
 
         list.sort(Comparator.comparing(Pair<Integer, Integer>::getValor2).reversed());
 
-        return list.getFirst().valor1 + ":" + list.getFirst().valor2;
+        return list.get(0).valor1 + ":" + list.get(0).valor2;
     }
 
     public static String topVotedActors(int num, int year){
@@ -266,5 +269,77 @@ public class ExecuteFunctions {
         return res.toString();
     }
 
+    public static String topMoviesWithMoreGender(int num, int ano, String gender){
+        List<Pair<String, Integer>> lista = new ArrayList<>();
+        int count = 0;
+        for (Movie movie : Main.movieList) {
+            if (count >= num){break;}
+            if (movie.getMovieReleaseDate().getYear() == ano){
+                lista.add(new Pair<>(movie.getMovieName(), 0));
+                for (Actor actor : Main.actorList) {
+                    if (movie.getMovieId() == actor.getMovieId() && actor.getActorGender().equals(gender)){
+                        for (Pair<String, Integer> pair : lista) {
+                            if (pair.valor1.equals(movie.getMovieName())){
+                                pair.valor2++;
+                            }
+                        }
+                    }
+                }
+                count++;
+            }
+        }
+
+        if (lista.isEmpty()){
+            return "No results";
+        }
+        lista.sort(Comparator.comparing(Pair<String, Integer>::getValor2).reversed().thenComparing(Pair::getValor1));
+        StringBuilder res = new StringBuilder();
+        for (Pair<String, Integer> pair : lista) {
+            res.append(pair.valor1).append(":").append(pair.valor2).append("\n");
+        }
+        return res.toString();
+    }
+
+    public static String topMoviesWithGenderBias(int num, int ano){
+        List<Pair<String, Pair<String, Integer>>> lista = new ArrayList<>();
+        int count = 0;
+        for (Movie movie : Main.movieList) {
+            if (count >= num){
+                break;
+            }
+            int countActors = 0;
+            int countActress = 0;
+            for (Actor actor : Main.actorList) {
+                if (actor.getMovieId() == movie.getMovieId()){
+                    if (actor.getActorGender().equals("M")){
+                        countActors++;
+                    } else {
+                        countActress++;
+                    }
+                }
+            }
+            if (countActors + countActress >= 11){
+                int percent;
+                if (countActors >= countActress){
+                    percent = (countActors * 100) / (countActors + countActress);
+                    lista.add(new Pair<>(movie.getMovieName(), new Pair<>("M", percent)));
+                } else {
+                    percent = (countActress * 100) / (countActors + countActress);
+                    lista.add(new Pair<>(movie.getMovieName(), new Pair<>("F", percent)));
+                }
+                count++;
+            }
+        }
+        if (lista.isEmpty()){
+            return "No results";
+        }
+        lista.sort(Comparator.comparing((Pair<String, Pair<String, Integer>> p) -> p.getValor2().getValor2()).reversed());
+
+        StringBuilder res = new StringBuilder();
+        for (Pair<String, Pair<String, Integer>> filmes : lista) {
+            res.append(filmes.valor1).append(':').append(filmes.valor2.valor1).append(':').append(filmes.valor2.valor2).append("\n");
+        }
+        return res.toString();
+    }
 
 }
